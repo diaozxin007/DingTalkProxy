@@ -16,14 +16,18 @@ class Client : AbstractVerticle() {
         val httpClientOptions = HttpClientOptions()
 
         // https 开关
-        httpClientOptions.isSsl = true
+        httpClientOptions.isSsl = false
 
         val client = vertx.createHttpClient(httpClientOptions)
 
-        client.webSocket(443, "api.xilidou.com", "/") { websocket ->
+        client.webSocket(8080, "127.0.0.1", "/") { websocket ->
             if (websocket.succeeded()) {
                 val result = websocket.result()
                 result.textMessageHandler(MessageHandler(eb))
+            }
+
+            if(websocket.failed()){
+                println(websocket.cause())
             }
         }
 

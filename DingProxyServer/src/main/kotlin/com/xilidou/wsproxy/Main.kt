@@ -10,13 +10,18 @@ import io.vertx.core.http.ServerWebSocket
 import io.vertx.core.json.JsonObject
 import io.vertx.ext.web.Router
 import org.slf4j.LoggerFactory
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicInteger
 
 
 class WebSocketVerticle : AbstractVerticle() {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
+    private val countMap = ConcurrentHashMap<String, AtomicInteger>();
+
     override fun start() {
+
 
         val options = ConfigStoreOptions()
             .setFormat("properties")
@@ -36,19 +41,33 @@ class WebSocketVerticle : AbstractVerticle() {
             .webSocketHandler { webSocket: ServerWebSocket ->
             run {
                 val binaryHandlerID = webSocket.binaryHandlerID()
+
+
                 log.info("binary id {}",binaryHandlerID)
                 val consumer = eb.consumer<String>("callback") { message ->
                     run {
+
+                        val check = check(binaryHandlerID)
+
                         val body = message.body()
                         println(binaryHandlerID)
                         log.info("send message {}",body)
                         webSocket.writeTextMessage(body)
+
+                        if(!check){
+                            webSocket.writeTextMessage("超过 10 次网络将会断开")
+                            webSocket.close()
+                        }
+
                     }
                 }
                 webSocket.endHandler(){
                     log.info("end",binaryHandlerID)
                     consumer.unregister();
                 }
+
+                webSocket.writeTextMessage("欢迎使用 xilidou 钉钉 代理")
+                webSocket.writeTextMessage("连接成功")
 
             }
         }
@@ -82,6 +101,27 @@ class WebSocketVerticle : AbstractVerticle() {
 
     override fun getVertx(): Vertx {
         return vertx;
+    }
+
+    fun check(id:String):Boolean{
+
+        val count = countMap.getOrDefault(id, AtomicInteger());
+
+        val flag =  count.addAndGet(1) <= 10
+
+        if(flag){
+            countMap[id] = count
+        }else{
+            countMap.remove(id);
+        }
+
+        log.info("count id $id and flag is $flag")
+
+        return flag
+
+
+
+
     }
 }
 
