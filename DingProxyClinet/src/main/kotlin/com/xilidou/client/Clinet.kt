@@ -15,6 +15,7 @@ class Client : AbstractVerticle() {
 
         val httpClientOptions = HttpClientOptions()
 
+        // https 开关
         httpClientOptions.isSsl = true
 
         val client = vertx.createHttpClient(httpClientOptions)
