@@ -39,32 +39,32 @@ compileTestKotlin {
 }
 
 
-//def mainVerticleName = "com.xilidou.wsproxy.WebSocketVerticle"
+def mainVerticleName = "com.xilidou.wsproxy.WebSocketVerticle"
 //watchForChange = "src/**/*.java"
 //doOnChange = "${projectDir}/gradlew classes"
-
+//
 // Redeploy watcher.
-//run {
-//    args = ['run', mainVerticleName,
-//            "--launcher-class=$mainClassName",
-//            "--redeploy=src/**/*.*",
-//            "--on-redeploy=./gradlew classes"
-//    ]
-//}
-//
-//// Naming and packaging settings for the "shadow jar".
-//shadowJar {
-//
-//    manifest {
-//        attributes 'Main-Verticle': mainVerticleName
-//    }
-//    mergeServiceFiles {
-//        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
-//    }
-//}
-//
-//
-//// Heroku relies on the 'stage' task to deploy.
-//task stage {
-//    dependsOn shadowJar
-//}
+run {
+    args = ['run', mainVerticleName,
+            "--launcher-class=$mainClassName",
+            "--redeploy=src/**/*.*",
+            "--on-redeploy=./gradlew classes"
+    ]
+}
+
+// Naming and packaging settings for the "shadow jar".
+shadowJar {
+
+    manifest {
+        attributes 'Main-Verticle': mainVerticleName
+    }
+    mergeServiceFiles {
+        include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+    }
+}
+
+
+// Heroku relies on the 'stage' task to deploy.
+task stage {
+    dependsOn shadowJar
+}
