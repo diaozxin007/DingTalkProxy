@@ -14,14 +14,13 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 
-class WebSocketVerticle : AbstractVerticle() {
+class DingVerticle : AbstractVerticle() {
 
     private val log = LoggerFactory.getLogger(this.javaClass)
 
     private val countMap = ConcurrentHashMap<String, AtomicInteger>();
 
     override fun start() {
-
 
         val options = ConfigStoreOptions()
             .setFormat("properties")
@@ -128,6 +127,6 @@ class WebSocketVerticle : AbstractVerticle() {
 
 fun main() {
     val vertx = Vertx.vertx()
-    vertx.deployVerticle(WebSocketVerticle())
+    vertx.deployVerticle(DingVerticle())
 }
 
